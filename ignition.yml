@@ -4,13 +4,25 @@ version: 1.4.0
 passwd:
   users:
     - name: core
-      password_hash: "$5$QQx.D1549w$INeU4...OyuLyUbdi1AyA"
+      password_hash: "$6$cUGZABfz$YnANQTSx1cCeTLfsNNURt17uqC72MoJqdf08.BUfhXjXBwsG1GSZB6QTLzNgOn/aT.ruVGZUhku47i/IIEq8./"
       ssh_authorized_keys:
-        - "ssh-rsa AAAAB3Nza...QP0MTkX0= core@example.com"
+        - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC0jJtB5QzXz0SxdIZZv8InpLdWHZHckm4ogitVCaZzDacRi2csMrxUdH1GAhYepoLgzlPe3TbRgXuWXFuQBl8t7h2Hoowew3YpOnYryiAy8+1zDdQFh0aSXg33YT6I5MHnDBr3pG7PWEKq6Ed5fsHsn/YKPfJ8jYyTM2areV5kHQZtIMs/mLc6NZumHdhEaHJhmUOtUTfyG19xJstUYViVTyCx4/UYEE8CHt97uBAogu3/DbFXirdCGU+OUq2JC9owNc1zk6ptHv9/XaSYPpJ1f5WI9/lPjEJGu4XBiH0WmcFii7j6r5aEesIG8u05hWpWPTRSB4Z/855iuc/KbcEV nguyenhungitc
+        - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDZdTev10WyOku1uSa3uGqOFaZejXMAM01MHbrAOToW/hl1ZqJqq+BYRH/DBqDKBvDeXG0zsWgl+E2wjTnqHqLj9WBvDY7tQdzT6iLt9S9kXnx9fqwWM+7n/lLxGuqffcBwKfe1sJpCif6WvDUTSAi+KSzxv3tN4tMeexCC2L7Qrt4BxpRz4anzKf4jXdfzjoeJpGH8CRtHukbO6iCf/6e2tk+iDn/G6wrzOU8q/jIAJ8qnmi9HY+3qlgDFVUKpF4VshMDDMLXGuH04S9wWqDsEKUUFq52UXNJdu8EGp3hZqyT4hRrCt0rXtFebsrJkseWqG++9vCHxxcVdFWs5Rb0kkec7ln4JuKbCCkuiHS/0xWRL3Q8cBOdMoGfuSzfXs4NCdlfPMafkZwRinKwM9gEddTtuckhYPkpHc6q0HMJ4tugQ9jOvZZ4/XrimlPq6lW3hEI83JWqFqspmo0BUr0JRlB3VeKCibjAbx1kgtEN/CWnUc4E8gR2GVJUB07aunfolfUKr38QBeCIZ22omYqRFx60Dd/m0cq1R6tMEx2IB6iKDnu7VaKrUYR+YvKRBbEIYL3UqM9sCLHLjbGZlPYX6r2UsOL0o/+/uSbd1KkWDv7BsIYPRoj4gplq9/gtTLxL9mez1l/B+PWD6IId5AoIBSfsjFNiOTbBYKT/sHTPTYQ== 2hpaygate
+        - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC3KLcqBppr22iehGfDVHwVF1JpWTyr6nK9+d3WmRoLYbTZNr2brN0y3wmqexLlVGnxepwyA0e47J7nyMgcRVaeTu32+q1PwHdul0WrrWO/X9r7EaBTnInGZzwJXQcZepD3PtButGlah1L6eMJibTslGaypkOwBeilJC3b9RDhh+9ZhjwWeGbZC3RYP1DzoY4vFNDoJjPOHdskBM7pd4RzweNY9NDUco7xMv5/XEOZlbz2B1dCeLDtrSUVJkEYU/aHCgzdgmIOZEXM4A1HDtdi2vgv/UU/dlKv0QsWOcMsYwPFUAlssjbRtVQNjyYxGfVEtXUlIj6xyVeOqRuhyVvhYwdttO2L4Oij/SbO8hKfnP1UJH/qRi8KNOIdNFT/Jyuuc2y5up4Zxs2KomjAjuN3nY7pfMqLQA+wVdHkDGNa7veEjNRFRUSTflCY7KeFrhf1mdyZ0AwBc49K4ALSHDugKK2IJJ5haqIgpnm2OlgYLDQfcOgokY7sqOeQwRAqFEE0= minhqh
       groups: [ sudo, docker ]
 
 systemd:
   units:
+    - name: systemd-resolved.service
+      enabled: false
+    - name: polkit.service
+      enabled: false
+    - name: fwupd.service
+      enabled: false
+    - name: fwupd-refresh.service
+      enabled: false
+    - name: fwupd-refresh.timer
+      enabled: false
     - name: install-rpms.service
       enabled: true
       contents: |
@@ -53,33 +65,36 @@ systemd:
 storage:
   links:
     - path: /etc/localtime
-      target: ../usr/share/zoneinfo/Asia/Ho_Chi_Minh
+      overwrite: true
+      target: /usr/share/zoneinfo/Asia/Ho_Chi_Minh
   files:
-    - path: /etc/sysctl.d/80-swappiness.conf
-      contents:
-        inline: "vm.swappiness=10"
-    - path: /etc/ssh/sshd_config.d/20-enable-passwords.conf
+    - path: /etc/selinux/config 
       mode: 0644
+      overwrite: true
       contents:
         inline: |
-          # Fedora CoreOS disables SSH password login by default.
-          # Enable it.
-          # This file must sort before 40-disable-passwords.conf.
-          PasswordAuthentication yes
+          SELINUX=disabled
+          SELINUXTYPE=targeted
+    - path: /etc/resolv.conf
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          nameserver 8.8.8.8
     - path: /etc/hostname
       overwrite: true
       contents:
         inline: coreos
-    - path: /etc/NetworkManager/system-connections/ens2.nmconnection
+    - path: /etc/NetworkManager/system-connections/ens192.nmconnection
       mode: 0600
       contents:
         inline: |
           [connection]
-          id=ens2
+          id=ens192
           type=ethernet
-          interface-name=ens2
+          interface-name=ens192
           [ipv4]
-          address1=192.168.1.10/24,192.168.1.1
+          address=192.168.1.6/24,192.168.1.1
           dns=8.8.8.8;
           dns-search=
           may-fail=false
