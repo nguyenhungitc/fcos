@@ -7,8 +7,6 @@ passwd:
       password_hash: "$6$cUGZABfz$YnANQTSx1cCeTLfsNNURt17uqC72MoJqdf08.BUfhXjXBwsG1GSZB6QTLzNgOn/aT.ruVGZUhku47i/IIEq8./"
       ssh_authorized_keys:
         - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC0jJtB5QzXz0SxdIZZv8InpLdWHZHckm4ogitVCaZzDacRi2csMrxUdH1GAhYepoLgzlPe3TbRgXuWXFuQBl8t7h2Hoowew3YpOnYryiAy8+1zDdQFh0aSXg33YT6I5MHnDBr3pG7PWEKq6Ed5fsHsn/YKPfJ8jYyTM2areV5kHQZtIMs/mLc6NZumHdhEaHJhmUOtUTfyG19xJstUYViVTyCx4/UYEE8CHt97uBAogu3/DbFXirdCGU+OUq2JC9owNc1zk6ptHv9/XaSYPpJ1f5WI9/lPjEJGu4XBiH0WmcFii7j6r5aEesIG8u05hWpWPTRSB4Z/855iuc/KbcEV nguyenhungitc
-        - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDZdTev10WyOku1uSa3uGqOFaZejXMAM01MHbrAOToW/hl1ZqJqq+BYRH/DBqDKBvDeXG0zsWgl+E2wjTnqHqLj9WBvDY7tQdzT6iLt9S9kXnx9fqwWM+7n/lLxGuqffcBwKfe1sJpCif6WvDUTSAi+KSzxv3tN4tMeexCC2L7Qrt4BxpRz4anzKf4jXdfzjoeJpGH8CRtHukbO6iCf/6e2tk+iDn/G6wrzOU8q/jIAJ8qnmi9HY+3qlgDFVUKpF4VshMDDMLXGuH04S9wWqDsEKUUFq52UXNJdu8EGp3hZqyT4hRrCt0rXtFebsrJkseWqG++9vCHxxcVdFWs5Rb0kkec7ln4JuKbCCkuiHS/0xWRL3Q8cBOdMoGfuSzfXs4NCdlfPMafkZwRinKwM9gEddTtuckhYPkpHc6q0HMJ4tugQ9jOvZZ4/XrimlPq6lW3hEI83JWqFqspmo0BUr0JRlB3VeKCibjAbx1kgtEN/CWnUc4E8gR2GVJUB07aunfolfUKr38QBeCIZ22omYqRFx60Dd/m0cq1R6tMEx2IB6iKDnu7VaKrUYR+YvKRBbEIYL3UqM9sCLHLjbGZlPYX6r2UsOL0o/+/uSbd1KkWDv7BsIYPRoj4gplq9/gtTLxL9mez1l/B+PWD6IId5AoIBSfsjFNiOTbBYKT/sHTPTYQ== 2hpaygate
-        - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC3KLcqBppr22iehGfDVHwVF1JpWTyr6nK9+d3WmRoLYbTZNr2brN0y3wmqexLlVGnxepwyA0e47J7nyMgcRVaeTu32+q1PwHdul0WrrWO/X9r7EaBTnInGZzwJXQcZepD3PtButGlah1L6eMJibTslGaypkOwBeilJC3b9RDhh+9ZhjwWeGbZC3RYP1DzoY4vFNDoJjPOHdskBM7pd4RzweNY9NDUco7xMv5/XEOZlbz2B1dCeLDtrSUVJkEYU/aHCgzdgmIOZEXM4A1HDtdi2vgv/UU/dlKv0QsWOcMsYwPFUAlssjbRtVQNjyYxGfVEtXUlIj6xyVeOqRuhyVvhYwdttO2L4Oij/SbO8hKfnP1UJH/qRi8KNOIdNFT/Jyuuc2y5up4Zxs2KomjAjuN3nY7pfMqLQA+wVdHkDGNa7veEjNRFRUSTflCY7KeFrhf1mdyZ0AwBc49K4ALSHDugKK2IJJ5haqIgpnm2OlgYLDQfcOgokY7sqOeQwRAqFEE0= minhqh
       groups: [ sudo, docker ]
 
 systemd:
@@ -34,7 +32,7 @@ systemd:
         After=multi-user.target
         [Service]
         Type=oneshot
-        ExecStart=rpm-ostree install git docker-compose htop --reboot
+        ExecStart=rpm-ostree install docker-compose --reboot
         [Install]
         WantedBy=multi-user.target
     - name: var-vm-swapfile.swap
@@ -68,6 +66,14 @@ storage:
       overwrite: true
       target: /usr/share/zoneinfo/Asia/Ho_Chi_Minh
   files:
+    - path: /etc/docker/daemon.json
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          {
+            "default-address-pools": [{"base":"192.168.0.0/16","size":24}]
+          }
     - path: /etc/selinux/config 
       mode: 0644
       overwrite: true
